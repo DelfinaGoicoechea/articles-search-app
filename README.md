@@ -1,73 +1,81 @@
-# React + TypeScript + Vite
+# Bootcamp Jan 13
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Monorepo: **UI** (Vite + React) and **backend** (Hono + SQLite with Drizzle).
 
-Currently, two official plugins are available:
+## Prerequisites
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- Node.js 18+
+- npm
 
-## React Compiler
+## Setup
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+npm install
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+One-time: create the SQLite DB and `articles` table:
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+npm run db:push -w backend
 ```
+
+## Run the apps
+
+From the repo root:
+
+| Command | What | URL |
+|--------|------|-----|
+| `npm run dev:ui` | React app (crypto search) | http://localhost:5173 |
+| `npm run dev:backend` | API server | http://localhost:3001 |
+
+Run both in separate terminals to work full-stack.
+
+## Backend API
+
+- **GET /** — health check (`{ "ok": true }`)
+- **GET /articles** — list all articles (JSON array). Optional query: `?title=...` to filter by title (case-insensitive, partial match).
+
+## Database (articles)
+
+- **Schema:** `backend/src/db/schema.ts` — table `articles` (id, title, body, createdAt, updatedAt).
+- **DB file:** `backend/data/sqlite.db` (created on first run; gitignored).
+
+**Add or edit articles:**
+
+1. **Reset script (clean slate + sample data):**  
+   `npm run db:reset -w backend` — deletes all articles, then inserts 15 sample articles with realistic, searchable titles (sourdough, TypeScript, REST API, React, etc.).
+
+2. **Drizzle Studio (easiest for one-off edits):**  
+   `npm run db:studio -w backend` → opens a UI in the browser to view/edit rows.
+
+3. **Code:** Use the `db` client in `backend/src/db/index.ts` and add a **POST /articles** route in `backend/src/index.ts` (e.g. with `db.insert(articles).values({ title, body })`).
+
+**Other DB commands (from repo root):**
+
+- `npm run db:push -w backend` — apply schema changes to the DB (no migration files).
+- `npm run db:generate -w backend` — generate migration files.
+- `npm run db:reset -w backend` — delete all articles and reseed with sample data (see above).
+
+## Project layout
+
+```
+├── ui/           # Vite + React app
+├── backend/     # Hono API + Drizzle + SQLite
+│   ├── scripts/
+│   │   └── reset-articles.ts   # reset DB + seed sample articles
+│   ├── src/
+│   │   ├── db/     # schema + DB client
+│   │   └── index.ts
+│   └── data/       # sqlite.db (local, gitignored)
+├── package.json   # workspaces + root scripts
+└── README.md
+```
+
+## Build for production
+
+```bash
+npm run build:ui
+npm run build:backend
+```
+
+Run the backend: `npm run start -w backend` (serves from `backend/dist`, same port 3001).
