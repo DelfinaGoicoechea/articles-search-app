@@ -35,6 +35,8 @@ Run both in separate terminals to work full-stack.
 - **GET /** — health check (`{ "ok": true }`)
 - **GET /articles** — list all articles (JSON array). Optional query: `?title=...` to filter by title (case-insensitive, partial match).
 
+Full API reference: **[backend/API.md](backend/API.md)** (response shapes, query params, examples).
+
 ## Database (articles)
 
 - **Schema:** `backend/src/db/schema.ts` — table `articles` (id, title, body, createdAt, updatedAt).

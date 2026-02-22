@@ -2,6 +2,8 @@
 
 Complete the following exercises and submit your work **via pull request**. Each exercise can be one or more commits; one PR per student is enough.
 
+**API reference:** See [`backend/API.md`](backend/API.md) for the backend endpoints (e.g. `GET /articles`, optional `?title=` filter) and response shapes.
+
 ---
 
 ## Exercise 1: Debounce function (pure JavaScript)
@@ -32,6 +34,7 @@ Implement a **useDebounce** hook in React.
 
 Connect the articles search UI to the real backend API.
 
+- **API docs:** Use [`backend/API.md`](backend/API.md) for endpoint details, query parameters, and response format.
 - **Current state:** The UI uses mock data and does not call the backend.
 - **Goal:** When the user types in the search box, the app should fetch articles from the backend (e.g. `GET /articles?title=...`) and display the results. Loading and empty states should still work.
 - **Requirements:**
