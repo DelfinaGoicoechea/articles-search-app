@@ -10,5 +10,8 @@
     "dev:backend": "npm run dev -w backend",
     "build:ui": "npm run build -w ui",
     "build:backend": "npm run build -w backend"
+  },
+  "devDependencies": {
+    "typescript": "^5.9.3"
   }
 }
