@@ -1,10 +1,18 @@
 import { like } from 'drizzle-orm'
 import { serve } from '@hono/node-server'
 import { Hono } from 'hono'
+import { cors } from 'hono/cors'
 import { db } from './db/index.js'
 import { articles } from './db/schema.js'
 
 const app = new Hono()
+
+app.use(
+  "*",
+  cors({
+    origin: "http://localhost:5173",
+  })
+);
 
 app.get('/', (c) => c.json({ ok: true }, 200))
 

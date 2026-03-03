@@ -1,27 +1,21 @@
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import * as Label from "@radix-ui/react-label";
 import * as ScrollArea from "@radix-ui/react-scroll-area";
 import { Loading } from "./components/Loading";
-import { MOCK_ARTICLES } from "./mock-articles";
+import { useArticles } from "./hooks/useArticles";
 import "./App.css";
-
-function filterArticles(query: string, articles: typeof MOCK_ARTICLES) {
-  const q = query.trim().toLowerCase();
-  if (!q) return [];
-  return articles.filter(
-    (a) =>
-      a.title.toLowerCase().includes(q) || a.body.toLowerCase().includes(q),
-  );
-}
+import { useDebounce } from "./hooks/useDebounce";
+import { ArticleList } from "./components/ArticlesList";
 
 export default function App() {
   const [query, setQuery] = useState("");
-  const [isLoading] = useState(false);
 
-  const filtered = useMemo(() => filterArticles(query, MOCK_ARTICLES), [query]);
+  const debouncedQuery = useDebounce(query, 500);
+  const {articles, isLoading} = useArticles(debouncedQuery);
 
-  const showResults = query.trim().length > 0;
-  const showLoading = isLoading && showResults;
+  const hasSearched = debouncedQuery.trim().length > 0;
+  const showEmpty = hasSearched && !isLoading && articles.length === 0;
+  const showList = hasSearched && articles.length > 0;
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) =>
     setQuery(e.target.value);
@@ -50,24 +44,17 @@ export default function App() {
       </div>
 
       <section className="articles-results" aria-live="polite">
-        {showLoading ? (
-          <Loading />
-        ) : (
+        {isLoading && <Loading />}
+        {!isLoading && (
           <ScrollArea.Root className="articles-scroll">
             <ScrollArea.Viewport className="articles-scroll-viewport">
               <ul className="articles-list">
-                {!showResults ? null : filtered.length === 0 ? (
+                {showEmpty && (
                   <li className="articles-list-empty">
                     No articles match your search.
                   </li>
-                ) : (
-                  filtered.map((article) => (
-                    <li key={article.id} className="articles-card">
-                      <h2 className="articles-card-title">{article.title}</h2>
-                      <p className="articles-card-body">{article.body}</p>
-                    </li>
-                  ))
                 )}
+                {showList && <ArticleList articles={articles} />}
               </ul>
             </ScrollArea.Viewport>
             <ScrollArea.Scrollbar
