@@ -1,83 +1,95 @@
-# Bootcamp Jan 13
+# Articles Search
 
-Monorepo: **UI** (Vite + React) and **backend** (Hono + SQLite with Drizzle).
+A React and TypeScript article search interface that fetches results from an existing REST API using debounced search.
 
-## Prerequisites
+This project was developed from an existing starter codebase. My work focused on implementing debouncing, replacing the mock data flow with real API requests, and organizing the frontend data-fetching logic.
 
-- Node.js 18+
-- npm
+## Preview
 
-## Setup
+![Articles Search interface](./docs/images/articles-search-preview.png)
 
-```bash
-npm install
-```
+## My Implementation
 
-One-time: create the SQLite DB and `articles` table:
+- Implemented a reusable `debounce` function in pure JavaScript
+- Created a custom React `useDebounce` hook
+- Replaced mock article data with real API requests
+- Connected the search input to the provided articles API
+- Used a configurable `VITE_API_URL` instead of hardcoding the backend URL
+- Applied debouncing to avoid unnecessary API requests while typing
+- Preserved loading and empty-result states when integrating the API
+- Refactored the articles feature into separate component, hook, and service responsibilities
+- Added the CORS configuration required for frontend-backend communication
 
-```bash
-npm run db:push -w backend
-```
+## How the Search Works
 
-## Run the apps
+The search input is debounced by `500ms`.
 
-From the repo root:
+Once the user stops typing, the debounced value is used to request matching articles from the API. This avoids sending a new request on every keystroke while keeping the search experience responsive.
 
-| Command | What | URL |
-|--------|------|-----|
-| `npm run dev:ui` | React app (crypto search) | http://localhost:5173 |
-| `npm run dev:backend` | API server | http://localhost:3001 |
+## Tech Stack
 
-Run both in separate terminals to work full-stack.
+**Frontend**
+- React
+- TypeScript
+- JavaScript
+- Vite
 
-## Backend API
+**Integration**
+- REST API
+- Fetch API
 
-- **GET /** — health check (`{ "ok": true }`)
-- **GET /articles** — list all articles (JSON array). Optional query: `?title=...` to filter by title (case-insensitive, partial match).
+> The backend and the initial UI structure and styling were provided as part of the starter codebase.
 
-Full API reference: **[backend/API.md](backend/API.md)** (response shapes, query params, examples).
+## Project Structure
 
-## Database (articles)
-
-- **Schema:** `backend/src/db/schema.ts` — table `articles` (id, title, body, createdAt, updatedAt).
-- **DB file:** `backend/data/sqlite.db` (created on first run; gitignored).
-
-**Add or edit articles:**
-
-1. **Reset script (clean slate + sample data):**  
-   `npm run db:reset -w backend` — deletes all articles, then inserts 15 sample articles with realistic, searchable titles (sourdough, TypeScript, REST API, React, etc.).
-
-2. **Drizzle Studio (easiest for one-off edits):**  
-   `npm run db:studio -w backend` → opens a UI in the browser to view/edit rows.
-
-3. **Code:** Use the `db` client in `backend/src/db/index.ts` and add a **POST /articles** route in `backend/src/index.ts` (e.g. with `db.insert(articles).values({ title, body })`).
-
-**Other DB commands (from repo root):**
-
-- `npm run db:push -w backend` — apply schema changes to the DB (no migration files).
-- `npm run db:generate -w backend` — generate migration files.
-- `npm run db:reset -w backend` — delete all articles and reseed with sample data (see above).
-
-## Project layout
-
-```
-├── ui/           # Vite + React app
-├── backend/     # Hono API + Drizzle + SQLite
-│   ├── scripts/
-│   │   └── reset-articles.ts   # reset DB + seed sample articles
-│   ├── src/
-│   │   ├── db/     # schema + DB client
-│   │   └── index.ts
-│   └── data/       # sqlite.db (local, gitignored)
-├── package.json   # workspaces + root scripts
+```text
+articles-search-app/
+├── ui/             React frontend
+├── backend/        Provided backend API
+├── homework.md     Original exercise requirements
 └── README.md
 ```
 
-## Build for production
+## Getting Started
 
-```bash
-npm run build:ui
-npm run build:backend
-```
+### Requirements
 
-Run the backend: `npm run start -w backend` (serves from `backend/dist`, same port 3001).
+Tested on:
+
+- macOS / Linux
+- Node.js 18+
+- npm
+
+### Install dependencies
+
+From the repository root:
+
+`npm install`
+
+### Initialize the provided backend
+
+Create the SQLite database and articles table:
+
+`npm run db:push -w backend`
+
+Seed the database with the provided sample articles:
+
+`npm run db:reset -w backend`
+
+### Run the application
+
+Start the backend:
+
+`npm run dev:backend`
+
+In a separate terminal, start the frontend:
+
+`npm run dev:ui`
+
+By default:
+- Frontend: `http://localhost:5173`
+- Backend: `http://localhost:3001`
+
+## Original Exercise
+
+The original requirements are available in [homework.md](./homework.md).
